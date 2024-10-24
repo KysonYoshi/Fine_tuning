@@ -26,6 +26,7 @@ def tokenize_function(examples):
     return tokenizer(examples["text"], padding="max_length", truncation=True)
 
 
+# Core training function
 def do_train(args, model, train_dataloader, save_dir="./out"):
     optimizer = AdamW(model.parameters(), lr=args.learning_rate)
     num_epochs = args.num_epochs
@@ -36,10 +37,11 @@ def do_train(args, model, train_dataloader, save_dir="./out"):
     model.train()
     progress_bar = tqdm(range(num_training_steps))
 
+    # Implement the training loop
     for epoch in range(num_epochs):
         for batch in train_dataloader:
-            # Move input data to the appropriate device
-            batch = {k: v.to(args.device) for k, v in batch.items()}
+            # Move batch to device (assume CUDA if available)
+            batch = {k: v.to(model.device) for k, v in batch.items()}
             
             # Forward pass
             outputs = model(**batch)
@@ -48,13 +50,9 @@ def do_train(args, model, train_dataloader, save_dir="./out"):
             # Backward pass
             loss.backward()
             
-            # Optimizer step
+            # Optimize and zero gradients
             optimizer.step()
-            
-            # Learning rate scheduler step
             lr_scheduler.step()
-            
-            # Zero gradients
             optimizer.zero_grad()
             
             # Update progress bar
@@ -65,6 +63,7 @@ def do_train(args, model, train_dataloader, save_dir="./out"):
     model.save_pretrained(save_dir)
 
     return
+
 
 
 
