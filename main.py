@@ -69,8 +69,6 @@ def do_train(args, model, train_dataloader, save_dir="./out"):
             # Update the progress bar
             progress_bar.update(1)
 
-    raise NotImplementedError
-
     ##### YOUR CODE ENDS HERE ######
 
     print("Training completed...")
