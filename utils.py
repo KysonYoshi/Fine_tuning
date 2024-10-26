@@ -62,39 +62,6 @@ def custom_transform(example):
 
     # You should update example["text"] using your transformation
 
-    text = example["text"]
-
-    # Find all adjectives using a simple regex or POS tagging if available
-    words = text.split()
-    
-    # Using a simple approach to locate adjectives. In a more comprehensive solution, we would use POS tagging
-    # For simplicity, let's assume adjectives are words that end in "ing", "ive", "al", etc.
-    adjectives = [word for word in words if re.match(r'\b\w*(ing|ive|al|ous|ful|able)\b', word)]
-    
-    # Shuffle the adjectives
-    shuffled_adjectives = adjectives[:]
-    random.shuffle(shuffled_adjectives)
-    
-    # Replace the original adjectives in order
-    transformed_text = text
-    for orig_adj, shuffled_adj in zip(adjectives, shuffled_adjectives):
-        transformed_text = transformed_text.replace(orig_adj, shuffled_adj, 1)
-
-    # Update the example with transformed text
-    example["text"] = transformed_text
-    text = example["text"]
-    
-    # Split text at common phrase separators
-    phrases = text.split(", ")
-    
-    # Shuffle phrases
-    random.shuffle(phrases)
-    
-    # Reconstruct the sentence
-    transformed_text = ", ".join(phrases)
-    
-    example["text"] = transformed_text
-
     words = example["text"].split()
     
     # Apply the synonym replacement transformation
