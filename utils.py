@@ -9,6 +9,7 @@ import torch
 from tqdm.auto import tqdm
 import evaluate
 import random
+import re
 import argparse
 from nltk.corpus import wordnet
 from nltk import word_tokenize
@@ -44,31 +45,24 @@ def custom_transform(example):
 
     # You should update example["text"] using your transformation
 
-    formal_to_informal = {
-        "extraordinary": "awesome",
-        "remarkable": "cool",
-        "fantastic": "great",
-        "film": "movie",
-        "perform": "do",
-        "purchase": "buy",
-        "encountered": "met",
-        "pleased": "happy"
-    }
+    text = example["text"]
+
+    # Find all adjectives using a simple regex or POS tagging if available
+    words = text.split()
     
-    words = example["text"].split()
-    transformed_words = []
+    # Using a simple approach to locate adjectives. In a more comprehensive solution, we would use POS tagging
+    # For simplicity, let's assume adjectives are words that end in "ing", "ive", "al", etc.
+    adjectives = [word for word in words if re.match(r'\b\w*(ing|ive|al|ous|ful|able)\b', word)]
     
-    # Set a probability threshold for transformation (e.g., 20%)
-    prob_threshold = 0.2
+    # Shuffle the adjectives
+    shuffled_adjectives = adjectives[:]
+    random.shuffle(shuffled_adjectives)
     
-    for word in words:
-        # Check if the word is in the formal_to_informal dictionary
-        if word in formal_to_informal and random.random() < prob_threshold:
-            # Replace with the informal version
-            transformed_words.append(formal_to_informal[word])
-        else:
-            transformed_words.append(word)
-    
-    # Join the words back into a transformed sentence
-    example["text"] = " ".join(transformed_words)
+    # Replace the original adjectives in order
+    transformed_text = text
+    for orig_adj, shuffled_adj in zip(adjectives, shuffled_adjectives):
+        transformed_text = transformed_text.replace(orig_adj, shuffled_adj, 1)
+
+    # Update the example with transformed text
+    example["text"] = transformed_text
     return example
