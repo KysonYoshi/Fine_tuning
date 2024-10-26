@@ -65,4 +65,16 @@ def custom_transform(example):
 
     # Update the example with transformed text
     example["text"] = transformed_text
+    text = example["text"]
+    
+    # Split text at common phrase separators
+    phrases = text.split(", ")
+    
+    # Shuffle phrases
+    random.shuffle(phrases)
+    
+    # Reconstruct the sentence
+    transformed_text = ", ".join(phrases)
+    
+    example["text"] = transformed_text
     return example
