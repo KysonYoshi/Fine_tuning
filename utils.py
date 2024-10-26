@@ -43,7 +43,7 @@ def custom_transform(example):
     # how you could implement two of them --- synonym replacement and typos.
 
     # You should update example["text"] using your transformation
-    import random
+    
     text = example["text"]
     
     # Split text at common phrase separators
