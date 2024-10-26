@@ -43,8 +43,19 @@ def custom_transform(example):
     # how you could implement two of them --- synonym replacement and typos.
 
     # You should update example["text"] using your transformation
-
-    raise NotImplementedError
+    import random
+    text = example["text"]
+    
+    # Split text at common phrase separators
+    phrases = text.split(", ")
+    
+    # Shuffle phrases
+    random.shuffle(phrases)
+    
+    # Reconstruct the sentence
+    transformed_text = ", ".join(phrases)
+    
+    example["text"] = transformed_text
 
     ##### YOUR CODE ENDS HERE ######
 
