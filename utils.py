@@ -34,6 +34,23 @@ def example_transform(example):
 # something called synsets (which stands for synonymous words) and for each of them, lemmas() should give you a possible synonym word.
 # You can randomly select each word with some fixed probability to replace by a synonym.
 
+def replace_with_synonym(word):
+    # Find synsets (synonyms) for the word using wordnet
+    synonyms = []
+    for syn in wordnet.synsets(word):
+        for lemma in syn.lemmas():
+            synonyms.append(lemma.name())
+
+    # Filter out duplicates and keep valid synonyms
+    synonyms = list(set(synonyms))
+
+    # If no synonyms, return original word
+    if len(synonyms) == 0:
+        return word
+
+    # Randomly replace the word with one of its synonyms with 20% probability
+    return random.choice(synonyms) if random.random() < 0.2 else word
+
 
 def custom_transform(example):
     ################################
@@ -78,30 +95,11 @@ def custom_transform(example):
     
     example["text"] = transformed_text
 
-    formal_to_informal = {
-        "extraordinary": "awesome",
-        "remarkable": "cool",
-        "fantastic": "great",
-        "film": "movie",
-        "perform": "do",
-        "purchase": "buy",
-        "encountered": "met",
-        "pleased": "happy"
-    }
     words = example["text"].split()
-    transformed_words = []
     
-    # Set a probability threshold for transformation (e.g., 20%)
-    prob_threshold = 0.2
+    # Apply the synonym replacement transformation
+    transformed_words = [replace_with_synonym(word) for word in words]
     
-    for word in words:
-        # Check if the word is in the formal_to_informal dictionary
-        if word in formal_to_informal and random.random() < prob_threshold:
-            # Replace with the informal version
-            transformed_words.append(formal_to_informal[word])
-        else:
-            transformed_words.append(word)
-    
-    # Join the words back into a transformed sentence
+    # Join transformed words back into a sentence
     example["text"] = " ".join(transformed_words)
     return example
