@@ -43,20 +43,32 @@ def custom_transform(example):
     # how you could implement two of them --- synonym replacement and typos.
 
     # You should update example["text"] using your transformation
-    
-    text = example["text"]
-    
-    # Split text at common phrase separators
-    phrases = text.split(", ")
-    
-    # Shuffle phrases
-    random.shuffle(phrases)
-    
-    # Reconstruct the sentence
-    transformed_text = ", ".join(phrases)
-    
-    example["text"] = transformed_text
 
-    ##### YOUR CODE ENDS HERE ######
-
+    formal_to_informal = {
+        "extraordinary": "awesome",
+        "remarkable": "cool",
+        "fantastic": "great",
+        "film": "movie",
+        "perform": "do",
+        "purchase": "buy",
+        "encountered": "met",
+        "pleased": "happy"
+    }
+    
+    words = example["text"].split()
+    transformed_words = []
+    
+    # Set a probability threshold for transformation (e.g., 20%)
+    prob_threshold = 0.2
+    
+    for word in words:
+        # Check if the word is in the formal_to_informal dictionary
+        if word in formal_to_informal and random.random() < prob_threshold:
+            # Replace with the informal version
+            transformed_words.append(formal_to_informal[word])
+        else:
+            transformed_words.append(word)
+    
+    # Join the words back into a transformed sentence
+    example["text"] = " ".join(transformed_words)
     return example
