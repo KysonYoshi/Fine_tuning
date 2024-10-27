@@ -117,6 +117,7 @@ def create_augmented_dataloader(args, dataset):
 
     # Step 1: Randomly select 5,000 examples from the training dataset
     num_augmented_samples = 5000
+    print(len(dataset))
     random_indices = random.sample(range(len(dataset)), num_augmented_samples)
     
     # Step 2: Create a subset of the original dataset with these 5,000 samples
