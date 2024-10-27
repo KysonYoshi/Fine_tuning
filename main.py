@@ -115,26 +115,22 @@ def create_augmented_dataloader(args, dataset):
     # dataloader will be for the original training split augmented with 5k random transformed examples from the training set.
     # You may find it helpful to see how the dataloader was created at other place in this code.
 
-    # Step 1: Randomly select 5,000 examples from the training dataset
-    num_augmented_samples = 5000
-    print(len(dataset))
-    random_indices = random.sample(range(len(dataset)), num_augmented_samples)
-    
-    # Step 2: Create a subset of the original dataset with these 5,000 samples
-    augmented_subset = Subset(dataset, random_indices)
-    
-    # Step 3: Apply the transformation function (e.g., synonym replacement or typo introduction) to each example
-    transformed_examples = []
-    for i in range(len(augmented_subset)):
-        transformed_example = typo_transform(augmented_subset[i])  # Replace with synonym_transform if needed
-        transformed_examples.append(transformed_example)
-    
-    # Step 4: Combine the original dataset with the transformed examples to create an augmented dataset
-    augmented_dataset = ConcatDataset([dataset, transformed_examples])
-    
-    # Step 5: Create a dataloader for the augmented dataset
-    data_collator = DataCollatorWithPadding(tokenizer=args.tokenizer)
-    train_dataloader = DataLoader(augmented_dataset, batch_size=args.train_batch_size, collate_fn=data_collator, shuffle=True)
+    # Select 5000 random samples from the original training set and apply transformation
+    original_train_dataset = dataset["train"]
+    transformed_train_dataset = original_train_dataset.shuffle(seed=42).select(range(5000))
+    transformed_train_dataset = transformed_train_dataset.map(custom_transform, load_from_cache_file=False)
+
+    # Combine original and transformed datasets
+    augmented_dataset = datasets.concatenate_datasets([original_train_dataset, transformed_train_dataset])
+
+    # Tokenize the combined dataset
+    augmented_tokenized_dataset = augmented_dataset.map(tokenize_function, batched=True, load_from_cache_file=False)
+    augmented_tokenized_dataset = augmented_tokenized_dataset.remove_columns(["text"])
+    augmented_tokenized_dataset = augmented_tokenized_dataset.rename_column("label", "labels")
+    augmented_tokenized_dataset.set_format("torch")
+
+    # Create a dataloader for the augmented dataset
+    train_dataloader = DataLoader(augmented_tokenized_dataset, shuffle=True, batch_size=args.batch_size)
 
     ##### YOUR CODE ENDS HERE ######
 
