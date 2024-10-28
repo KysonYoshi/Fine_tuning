@@ -130,7 +130,7 @@ def create_augmented_dataloader(args, dataset):
     augmented_tokenized_dataset.set_format("torch")
 
     # Create a dataloader for the augmented dataset
-    train_dataloader = DataLoader(augmented_tokenized_dataset, shuffle=True, batch_size=args.batch_size)
+    train_dataloader = DataLoader(augmented_tokenized_dataset, batch_size=args.batch_size)
 
     ##### YOUR CODE ENDS HERE ######
 
